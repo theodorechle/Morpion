@@ -5,4 +5,3 @@ def reset_data(nb):
 
 reset_data(1)
 reset_data(2)
-reset_data(3)

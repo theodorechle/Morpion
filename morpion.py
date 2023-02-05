@@ -61,10 +61,12 @@ def placement(position, player):
     x, y = position
     if player:
         board[y][x] = 1
-        circle(x, y)
+        if display:
+            circle(x, y)
     else:
         board[y][x] = 2
-        cross(x, y)
+        if display:
+            cross(x, y)
 
 def lines():
     """
@@ -85,8 +87,6 @@ def load_data(number):
 def save_data(number, data):
     with open("data_"+str(number)+".bin", "wb") as d:
         pickle.dump(data, d)
-
-
 
 def ai(data):
     """
@@ -139,33 +139,43 @@ self_ia = False
 auto = False
 print("""
 Players :
-0 : IA VS IA
-1 : IA VS HERSELF
-else : IA VS PLAYER""")
+0 : AI VS AI
+1 : AI VS HERSELF
+2 : AI VS PLAYER
+else : PLAYER VS AI""")
 match = input("player ? ")
 if match == "0":
     auto = True
 elif match == "1":
     self_ia = True
 
-if auto:
-    data_2 = load_data(2)
-
-if not self_ia:
+try:
+    if auto:
+        data_2 = load_data(2)
+    data = load_data(1)
+except EOFError:
+    print("Save not valid")
+    from reset import *
+    print("Save reset")
+    if auto:
+        data_2 = load_data(2)
     data = load_data(1)
 
-else:
-    data = load_data(3)
+display = True
+if auto or self_ia:
+    display = input("0 : display\nelse : don't display\ndisplay ?")=="0"
 
-screen = pygame.display.set_mode((absciss*3, ordonned*3))
+if display:
+    screen = pygame.display.set_mode((absciss*3, ordonned*3))
 
 end = False
-
+i=0
 while not end:
-    screen.fill((255, 255, 255))
-    lines()
-    new_importance = [[10,10,10],[10,10,10],[10,10,10]]
-    board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+    if display:
+        screen.fill((255, 255, 255))
+        lines()
+    new_importance = ([10,10,10],[10,10,10],[10,10,10])
+    board = ([0, 0, 0], [0, 0, 0], [0, 0, 0])
     coords_ai = []
     indexs = []
     if auto:
@@ -173,13 +183,15 @@ while not end:
         indexs_2 = []
     run = True
     winner = None
-    player = True # True : player, False : AI
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            end = True
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
+    player = (True if match in ["0","1","2"] else False) # True : player, False : AI
+    if display:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 end = True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    end = True
+    i+=1
     while run:
         if not self_ia and player:
             if auto:
@@ -193,6 +205,7 @@ while not end:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         run = False
+                        end = True
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if pygame.mouse.get_pressed() == (1, 0, 0):
                             pos = pygame.mouse.get_pos()
@@ -210,15 +223,15 @@ while not end:
             placement(coords, player)
             player = not player
             run, winner = verification_of_victory()
-        
-        pygame.display.flip()
+        if display:
+            pygame.display.flip()
     
 
     change_values() # change the tab
-    if not self_ia:
-        save_data(1,data)
-    else:
-        save_data(3,data)
     if auto:
         save_data(2,data_2)
-pygame.quit()
+    else:
+        save_data(1,data)
+    print("number of played games :",i)
+if display:
+    pygame.quit()

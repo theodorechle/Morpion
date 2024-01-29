@@ -10,7 +10,7 @@ To play :
 - If you choose AI vs Herself, You need to choose if games are displayed (0) or not (any other input) (much faster if not)
 
 If save is corrupted (especially if you stop the execution when he write in the save), the script will create a new save (and say their is an error).
-The program display the number of played games since the beginning of the exectuion of the script.
+The program display the number of played games since the beginning of the execution of the script.
 
 
 It's more interesting when the AI starts the game (maybe she can find how to won every time).
